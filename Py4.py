@@ -102,10 +102,10 @@ class MainWindow(QtWidgets.QMainWindow):
                 fftArray = np.fft.fftshift(fftArray)
                 fftFreqArray = np.fft.fftshift(fftFreqArray)
                 self.sc.axes.plot(fftFreqArray, abs(fftArray), label=label)
-                self.sc.axes.set_xlabel("Frequency")
+                self.sc.axes.set_xlabel("Frequency (s-1)")
             else:
                 self.sc.axes.plot(probeData[: , 1], probeData[: , probeNum+1], label=label)
-                self.sc.axes.set_xlabel("Time")
+                self.sc.axes.set_xlabel("Time (ns)")
 
         # Reduce list of units to remove repeats
         units = list(dict.fromkeys(units))
