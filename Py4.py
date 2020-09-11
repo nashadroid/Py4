@@ -13,6 +13,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
+multipliers = [1e-6 , 1e-3, 1e0 , 1e3 , 1e6]
 
 class MplCanvas(FigureCanvasQTAgg):
 
@@ -31,7 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("Py4")
 
         self.sc = MplCanvas(self, width=4, height=3, dpi=100)
-        self.sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
+        # self.sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
         self.sc.setMinimumSize(500,400)
 
         # Create toolbar, passing canvas as first parameter, parent (self, the MainWindow) as second.
@@ -58,15 +59,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.logx.stateChanged.connect(self.update_plot)
         self.logy.stateChanged.connect(self.update_plot)
 
+        # Multiplier selectors
+        self.XmultiplierSelector = QtWidgets.QComboBox(self)
+        for multiplier in multipliers:
+            self.XmultiplierSelector.addItem("{:.0e}".format(multiplier))
+        self.XmultiplierSelector.setCurrentIndex(2)
+        self.XmultiplierSelector.currentIndexChanged.connect(self.update_plot)
+
+        self.YmultiplierSelector = QtWidgets.QComboBox(self)
+        for multiplier in multipliers:
+            self.YmultiplierSelector.addItem("{:.0e}".format(multiplier))
+        self.YmultiplierSelector.setCurrentIndex(2)
+        self.YmultiplierSelector.currentIndexChanged.connect(self.update_plot)
+
+
         self.options = QtWidgets.QHBoxLayout()
 
         self.options.addWidget(self.fft)
         self.options.addWidget(self.logx)
         self.options.addWidget(self.logy)
+        self.options.addWidget(self.XmultiplierSelector)
+        self.options.addWidget(self.YmultiplierSelector)
 
         self.optionsWidget = QtWidgets.QWidget()
         self.optionsWidget.setLayout(self.options)
-        
+
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.listWidget)
         layout.addWidget(self.optionsWidget)
@@ -101,10 +118,14 @@ class MainWindow(QtWidgets.QMainWindow):
                 fftFreqArray = fftfreq(len(probeData[: , probeNum+1]), d=(probeData[1,1]*1e-9))
                 fftArray = np.fft.fftshift(fftArray)
                 fftFreqArray = np.fft.fftshift(fftFreqArray)
-                self.sc.axes.plot(fftFreqArray, abs(fftArray), label=label)
+                self.sc.axes.plot(float((self.XmultiplierSelector.currentText()))*fftFreqArray,
+                                  abs(fftArray),
+                                  label=label)
                 self.sc.axes.set_xlabel("Frequency (s-1)")
             else:
-                self.sc.axes.plot(probeData[: , 1], probeData[: , probeNum+1], label=label)
+                self.sc.axes.plot(float((self.XmultiplierSelector.currentText()))*probeData[: , 1],
+                                  float((self.YmultiplierSelector.currentText()))*probeData[: , probeNum+1],
+                                  label=label)
                 self.sc.axes.set_xlabel("Time (ns)")
 
         # Reduce list of units to remove repeats
@@ -121,7 +142,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.logy.isChecked():
             self.sc.axes.set_yscale('log')
 
-        self.sc.axes.set_ylabel(units[0])
+        if units:
+            self.sc.axes.set_ylabel(units[0])
 
         if len(self.probeNums) > 1 :
             self.sc.axes.legend()
