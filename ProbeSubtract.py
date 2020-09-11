@@ -3,8 +3,10 @@ from numpy import loadtxt, savetxt
 import numpy as np
 import sys
 
-bgSimHist = "/fs/scratch/PAS0035/nashad/11141350.owens-batch.ten.osc.edu/AllOutletNoTarget/history.p4"
+# bgSimHist = "/fs/scratch/PAS0035/nashad/11141350.owens-batch.ten.osc.edu/AllOutletNoTarget/history.p4"
+bgSimHist = "history.p4"
 newSimHist = "history.p4"
+saveFile= "BGSubtractHistory.p4"
 
 newSimProbes = []
 with open(newSimHist, 'r') as f:
@@ -23,7 +25,7 @@ with open(newSimHist, 'r') as f:
     # Make a list with all the probe names
     for line in lines[2:]:
         if line[0] == '#':
-            newSimProbes.append(str(line))
+            newSimProbes.append(str(line[1:]))
 
 bgSimProbes = []
 with open(bgSimHist, 'r') as f:
@@ -42,7 +44,7 @@ with open(bgSimHist, 'r') as f:
     # Make a list with all the probe names
     for line in lines[2:]:
         if line[0] == '#':
-            bgSimProbes.append(str(line))
+            bgSimProbes.append(str(line[1:]))
 
 # Check if same exact probes
 if newSimProbes != bgSimProbes:
@@ -50,13 +52,15 @@ if newSimProbes != bgSimProbes:
     exit(1)
 
 # Load in the actual data, yes I know it's inefficient to open the file twice
-print("Loading history.p4...")
+print("Loading " + bgSimHist)
 bgProbeData = loadtxt(bgSimHist, comments="#", delimiter=" ", unpack=False)
+print("Loading " + newSimHist)
 newProbeData = loadtxt(newSimHist, comments="#", delimiter=" ", unpack=False)
 
 bgSubtractData = newProbeData - newProbeData
 
-header = "#Background Subtracted\n#\n" + "\n".join(bgProbeData)[1:-1]
+header = "#Background Subtracted\n#\n" + "".join(bgSimProbes)
 
-savetxt("BGSubtractHistory.p4", bgSubtractData, header=header)
+print("Saving " + saveFile)
+savetxt(saveFile, bgSubtractData, header=header, comments="#")
 
