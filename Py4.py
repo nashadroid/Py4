@@ -72,7 +72,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.YmultiplierSelector.setCurrentIndex(2)
         self.YmultiplierSelector.currentIndexChanged.connect(self.update_plot)
 
+        # Starting Time Selector
+        self.timeStepBox = QtWidgets.QLineEdit(self)
+        self.timeStepBox.textChanged.connect(self.update_plot)
 
+        #self.updateButton = QtWidgets.QPushButton("Update")
+
+        # Make widget to hold all our options
         self.options = QtWidgets.QHBoxLayout()
 
         self.options.addWidget(self.fft)
@@ -80,10 +86,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.options.addWidget(self.logy)
         self.options.addWidget(self.XmultiplierSelector)
         self.options.addWidget(self.YmultiplierSelector)
+        self.options.addWidget(self.timeStepBox)
+        #self.options.addWidget(self.updateButton)
 
         self.optionsWidget = QtWidgets.QWidget()
         self.optionsWidget.setLayout(self.options)
 
+        # Build the main layout
         layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.listWidget)
         layout.addWidget(self.optionsWidget)
@@ -98,6 +107,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
 
     def update_plot(self):
+
+        try: 
+            startingPos = int(self.timeStepBox.text())
+        except:
+            startingPos = 0
+
+        probeData = probeDataAll[startingPos:]
 
         selectedItemText = [item.text() for item in self.listWidget.selectedItems()]
         self.probeNums = [i for i, probe in enumerate(probes) if probe in selectedItemText]
@@ -168,8 +184,12 @@ with open(file, 'r') as f:
     except:
         print("Cannot Read File")
         exit(1)
-
-    title = lines[0][1:lines[0].find(":")]
+    
+    # Get the sim title
+    try:
+        title = lines[0][1:lines[0].find(":")]
+    except:
+        title = ""
 
     # Make a list with all the probe names
     for line in lines[4:]:
@@ -178,7 +198,7 @@ with open(file, 'r') as f:
 
 # Load in the actual data, yes I know it's inefficient to open the file twice
 print("Loading history.p4...")
-probeData = loadtxt(file, comments="#", delimiter=" ", unpack=False)
+probeDataAll = loadtxt(file, comments="#", delimiter=" ", unpack=False)
 
 print("Launching GUI")
 app = QtWidgets.QApplication(sys.argv)
