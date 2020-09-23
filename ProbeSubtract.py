@@ -3,8 +3,8 @@ from numpy import loadtxt, savetxt
 import numpy as np
 import sys
 
-# bgSimHist = "/fs/scratch/PAS0035/nashad/11141350.owens-batch.ten.osc.edu/AllOutletNoTarget/history.p4"
-bgSimHist = "history.p4"
+bgSimHist = "/fs/scratch/PAS0035/nashad/11141350.owens-batch.ten.osc.edu/AllOutletNoTarget/history.p4"
+# bgSimHist = "history.p4"
 newSimHist = "history.p4"
 saveFile= "BGSubtractHistory.p4"
 
@@ -57,7 +57,8 @@ bgProbeData = loadtxt(bgSimHist, comments="#", delimiter=" ", unpack=False)
 print("Loading " + newSimHist)
 newProbeData = loadtxt(newSimHist, comments="#", delimiter=" ", unpack=False)
 
-bgSubtractData = newProbeData - newProbeData
+bgSubtractData = np.subtract(newProbeData, bgProbeData)
+bgSubtractData[:,1] = newProbeData[:,1]
 
 header = "#Background Subtracted\n#\n" + "".join(bgSimProbes)
 

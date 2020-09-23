@@ -29,7 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.probeNums = []
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setWindowTitle("Py4")
+        self.setWindowTitle("Py4 - " + title)
 
         self.sc = MplCanvas(self, width=4, height=3, dpi=100)
         # self.sc.axes.plot([0,1,2,3,4], [10,1,20,3,40])
@@ -168,6 +168,8 @@ with open(file, 'r') as f:
     except:
         print("Cannot Read File")
         exit(1)
+
+    title = lines[0][1:lines[0].find(":")]
 
     # Make a list with all the probe names
     for line in lines[4:]:
