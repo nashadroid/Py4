@@ -76,6 +76,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timeStepBox = QtWidgets.QLineEdit(self)
         self.timeStepBox.textChanged.connect(self.update_plot)
 
+        # Ending Time Selector
+        self.endTimeStepBox = QtWidgets.QLineEdit(self)
+        self.endTimeStepBox.textChanged.connect(self.update_plot)
+
         #self.updateButton = QtWidgets.QPushButton("Update")
 
         # Make widget to hold all our options
@@ -87,6 +91,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.options.addWidget(self.XmultiplierSelector)
         self.options.addWidget(self.YmultiplierSelector)
         self.options.addWidget(self.timeStepBox)
+        self.options.addWidget(self.endTimeStepBox)
         #self.options.addWidget(self.updateButton)
 
         self.optionsWidget = QtWidgets.QWidget()
@@ -113,7 +118,12 @@ class MainWindow(QtWidgets.QMainWindow):
         except:
             startingPos = 0
 
-        probeData = probeDataAll[startingPos:]
+        try: 
+            endingPos = int(self.endTimeStepBox.text())
+        except:
+            endingPos = -1
+
+        probeData = probeDataAll[startingPos:endingPos]
 
         selectedItemText = [item.text() for item in self.listWidget.selectedItems()]
         self.probeNums = [i for i, probe in enumerate(probes) if probe in selectedItemText]
@@ -125,13 +135,15 @@ class MainWindow(QtWidgets.QMainWindow):
         for probeNum in self.probeNums:
             # Extract the label and unit of each probe
             [_ , label , unit] = probes[probeNum].split(": ")
-            units.append(unit)
+            
         
             #plot
             if self.fft.isChecked():
                 #npArray = np.array([probeData[: , probeNum+1]])
-                fftArray = fft(probeData[: , probeNum+1])
-                fftFreqArray = fftfreq(len(probeData[: , probeNum+1]), d=(probeData[1,1]*1e-9))
+                unit+="*sec"
+                fftArray = fft(probeData[: , probeNum+1])/len(probeData)
+                fftFreqArray = fftfreq(len(probeData[: , probeNum+1]), 
+			d=((probeData[-1,1]-probeData[1,1])/len(probeData)*1e-9))
                 fftArray = np.fft.fftshift(fftArray)
                 fftFreqArray = np.fft.fftshift(fftFreqArray)
                 self.sc.axes.plot(float((self.XmultiplierSelector.currentText()))*fftFreqArray,
@@ -139,10 +151,11 @@ class MainWindow(QtWidgets.QMainWindow):
                                   label=label)
                 self.sc.axes.set_xlabel("Frequency (s-1)")
             else:
-                self.sc.axes.plot(float((self.XmultiplierSelector.currentText()))*probeData[: , 1],
+                self.sc.axes.plot(float((self.XmultiplierSelector.currentText()))*1e6*probeData[: , 1],
                                   float((self.YmultiplierSelector.currentText()))*probeData[: , probeNum+1],
                                   label=label)
-                self.sc.axes.set_xlabel("Time (ns)")
+                self.sc.axes.set_xlabel("Time (fs)")
+            units.append(unit)
 
         # Reduce list of units to remove repeats
         units = list(dict.fromkeys(units))
