@@ -134,7 +134,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
         for probeNum in self.probeNums:
             # Extract the label and unit of each probe
-            [_ , label , unit] = probes[probeNum].split(": ")
+            try:
+                [_ , label, unit] = probes[probeNum].split(": ")
+            except:
+                [_ , label, label2 , unit] = probes[probeNum].split(": ")
+                label = label + label2
             
         
             #plot
