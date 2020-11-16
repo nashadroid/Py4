@@ -120,7 +120,7 @@ class MainWindow(QtWidgets.QMainWindow):
             startingPos = 0
 
         try: 
-            endingPos = probeData[: , 1].index(next(filter(lambda i: i >= int(self.endTimeStepBox.text())1e-9 , probeData[: , 1])))
+            endingPos = probeData[: , 1].index(next(filter(lambda i: i >= int(self.endTimeStepBox.text())*1e-9 , probeData[: , 1])))
         except:
             endingPos = -1
 	
