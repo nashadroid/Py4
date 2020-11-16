@@ -122,6 +122,10 @@ class MainWindow(QtWidgets.QMainWindow):
             endingPos = int(self.endTimeStepBox.text())
         except:
             endingPos = -1
+	
+	if startingPos >= endingPos :
+            startingPos = 0
+            endingPos = -1
 
         probeData = probeDataAll[startingPos:endingPos]
 
