@@ -113,7 +113,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def update_plot(self):
 
-        try: 
+        try:
+            print(j*1e6)
+            print(int(self.timeStepBox.text())))
+            print(next((i for i, j in enumerate(probeData[: , 1]) if j*1e6>=int(self.timeStepBox.text())), None))
             startingPos = next((i for i, j in enumerate(probeData[: , 1]) if j*1e6>=int(self.timeStepBox.text())), None)
 	
         except:
