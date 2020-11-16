@@ -124,7 +124,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except:
             endingPos = -1
 	
-	if (startingPos >= endingPos):
+        if (startingPos >= endingPos):
             startingPos = 0
             endingPos = -1
 
