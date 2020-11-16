@@ -114,13 +114,13 @@ class MainWindow(QtWidgets.QMainWindow):
     def update_plot(self):
 
         try: 
-            startingPos = probeData[: , 1].index(next(filter(lambda i: i >= int(self.timeStepBox.text())*1e-9 , probeData[: , 1])))
+            startingPos = next((i for i, j in enumerate(probeData[: , 1]) if j*1e6>=int(self.timeStepBox.text())), None)
 	
         except:
             startingPos = 0
 
         try: 
-            endingPos = probeData[: , 1].index(next(filter(lambda i: i >= int(self.endTimeStepBox.text())*1e-9 , probeData[: , 1])))
+            endingPos = probeData[: , 1].index(next(filter(lambda i: i >= int(self.endTimeStepBox.text())*1e-6 , probeData[: , 1])))
         except:
             endingPos = -1
 	
