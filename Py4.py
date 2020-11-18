@@ -113,19 +113,25 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def update_plot(self):
 
-        try:
-            print(int(self.timeStepBox.text()))
-            print(next((i for i, j in enumerate(probeData[: , 1]) if j*1e6>=int(self.timeStepBox.text())), None))
-            print(next((j for i, j in enumerate(probeData[: , 1]) if j*1e6>=int(self.timeStepBox.text())), None))
-            startingPos = next((i for i, j in enumerate(probeData[: , 1]) if j*1e6>=int(self.timeStepBox.text())), None)
+#         try:
+#             startingPos = int(self.timeStepBox.text())
 	
-        except:
-            startingPos = 0
+#         except:
+#             startingPos = 0
 
-        try: 
-            endingPos = probeData[: , 1].index(next(filter(lambda i: i >= int(self.endTimeStepBox.text())*1e-6 , probeData[: , 1])))
-        except:
-            endingPos = -1
+#         try: 
+#             endingPos = int(self.endTimeStepBox.text())
+#         except:
+#             endingPos = -1
+        startTime = int(self.timeStepBox.text())
+        endTime = int(self.endTimeStepBox.text())
+        startingPos = 0
+        endingPos = -1
+        for i , t in enumerate(1e6*probeData[: , 1]):
+            if (t < startTime):
+		startingPos = i
+            if (t < endTime):
+                endingPos = i
 	
         if (startingPos >= endingPos):
             startingPos = 0
