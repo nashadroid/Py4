@@ -129,10 +129,10 @@ class MainWindow(QtWidgets.QMainWindow):
         endingPos = -1
         for i , t in enumerate(1e6*probeData[: , 1]):
             if (t < startTime):
-		startingPos = i
+                startingPos = i
             if (t < endTime):
                 endingPos = i
-	
+
         if (startingPos >= endingPos):
             startingPos = 0
             endingPos = -1
