@@ -49,7 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.listWidget.addItem(item)
         self.listWidget.itemClicked.connect(self.update_plot)
         self.listWidget.setMinimumSize(100,200)
-        
+
         # Options
         self.fft = QtWidgets.QCheckBox("fft")
         self.logx = QtWidgets.QCheckBox("Log-X")
@@ -115,19 +115,27 @@ class MainWindow(QtWidgets.QMainWindow):
 
 #         try:
 #             startingPos = int(self.timeStepBox.text())
-	
+
 #         except:
 #             startingPos = 0
 
-#         try: 
+#         try:
 #             endingPos = int(self.endTimeStepBox.text())
 #         except:
 #             endingPos = -1
-        startTime = int(self.timeStepBox.text())
-        endTime = int(self.endTimeStepBox.text())
+        try:
+            startTime = int(self.timeStepBox.text())
+        except:
+            startTime = -1e20
+
+        try:
+            endTime = int(self.endTimeStepBox.text())
+        except:
+            endTime = 1e20
+
         startingPos = 0
         endingPos = -1
-        for i , t in enumerate(1e6*probeData[: , 1]):
+        for i , t in enumerate(1e6*probeDataAll[: , 1]):
             if (t < startTime):
                 startingPos = i
             if (t < endTime):
@@ -153,14 +161,14 @@ class MainWindow(QtWidgets.QMainWindow):
             except:
                 [_ , label, label2 , unit] = probes[probeNum].split(": ")
                 label = label + label2
-            
-        
+
+
             #plot
             if self.fft.isChecked():
                 #npArray = np.array([probeData[: , probeNum+1]])
                 unit+="*sec"
                 fftArray = fft(probeData[: , probeNum+1])/len(probeData)
-                fftFreqArray = fftfreq(len(probeData[: , probeNum+1]), 
+                fftFreqArray = fftfreq(len(probeData[: , probeNum+1]),
 			d=((probeData[-1,1]-probeData[1,1])/len(probeData)*1e-9))
                 fftArray = np.fft.fftshift(fftArray)
                 fftFreqArray = np.fft.fftshift(fftFreqArray)
@@ -215,7 +223,7 @@ with open(file, 'r') as f:
     except:
         print("Cannot Read File")
         exit(1)
-    
+
     # Get the sim title
     try:
         title = lines[0][1:lines[0].find(":")]
@@ -235,6 +243,3 @@ print("Launching GUI")
 app = QtWidgets.QApplication(sys.argv)
 w = MainWindow()
 app.exec_()
-
-
-
